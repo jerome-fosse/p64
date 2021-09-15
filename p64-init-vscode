@@ -1,0 +1,112 @@
+read -p "Do you want to use vscode ? [Y/n] : " answer
+case $answer in
+    Y|y|Yes|YES|yes|"")
+        VSCODE="YES"
+        ;;
+    *)
+        VSCODE="NO"
+        ;;
+esac
+
+
+if [ $VSCODE = "YES" ]; then
+    if [ -z $PROJECT_NAME ]; then
+        ask_project_name
+    fi
+
+    echo "Creating VSCode configuration..."
+
+    if [ ! -e .vscode ]; then
+        mkdir .vscode
+    fi
+
+    cat > .vscode/tasks.json << EOF
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "run",
+            "type": "shell",
+            "command": "x64 +warp -refresh 1 -speed 110 \${workspaceFolder}/build/bin/$(echo ${PROJECT_NAME} | tr [:upper:] [:lower:]).prg",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "debug",
+            "type": "shell",
+            "command": "\${workspaceFolder}/.vscode/debug.sh \${workspaceFolder}/build/bin/$(echo ${PROJECT_NAME} | tr [:upper:] [:lower:]).prg",
+            "presentation": {
+                "echo": true,
+                "reveal": "never",
+                "focus": true,
+                "clear": false
+            }
+        }
+    ]
+}    
+EOF
+
+    cat > .vscode/debug.sh << EOF
+#!/bin/sh
+export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib/
+DEBUGGER_OPT=" -layout 3 -wait 2500 -autojmp"
+if [ -e .watches ]; then
+    DEBUGGER_OPT="\$DEBUGGER_OPT -watch .watches"
+fi
+if [ -e .labels ]; then
+    DEBUGGER_OPT="\$DEBUGGER_OPT -symbols .labels"
+fi
+if [ -e .breakpoints ]; then
+    DEBUGGER_OPT="\$DEBUGGER_OPT -breakpoints .breakpoints"
+fi
+
+C64Debugger \$DEBUGGER_OPT -prg \$1    
+EOF
+
+    chmod +x .vscode/debug.sh
+
+	cat > .watches << EOF
+# Put in this file all the values in memory you want to watch. When in C64Debugger
+# use Ctrl + W to show the watches view. The format is simple. One watch per line. 
+# A watch is a pair of values : an hexadecimal memory address and a label separated 
+# by a space character.
+#
+# Example :
+# 01ba my_label	
+EOF
+
+	cat > .breakpoints << EOF
+# This files stores information about breakpoints.
+# Formats are :
+# break 3FFF           -> add a breakpoint when address $3FFF is reached
+# breakraster 100      -> add a breakpoint when raster reaches line 100
+# breakmen 3FFF == 0A  -> add a breakpoint when value stored in memory address $3FFF is equal to $0A
+# breakmen 3FFF != 0A  -> add a breakpoint when value stored in memory address $3FFF is not equal to $0A
+# breakmen 3FFF < 0A   -> add a breakpoint when value stored in memory address $3FFF is lower than $0A
+# breakmen 3FFF <= 0A  -> add a breakpoint when value stored in memory address $3FFF is lower or equal to $0A
+# breakmen 3FFF >  0A  -> add a breakpoint when value stored in memory address $3FFF is greater than $0A
+# breakmen 3FFF >= 0A  -> add a breakpoint when value stored in memory address $3FFF is greater or equal to $0A
+# breakvic             -> add a breakpoint on VIC interrupt
+# breakcia             -> add a breakpoint on CIA interrupt
+# breaknmi             -> add a breakpoint on NMI interrupt
+EOF
+fi

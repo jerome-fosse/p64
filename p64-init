@@ -1,0 +1,42 @@
+. $PRJ_C64_DIR/p64-init-common
+
+# must be in a writable directory
+if [ ! -w ./ ]; then
+    echo "Error. You must have write permission on the current directory."
+    exit 1
+fi
+
+SUB_COMMAND=$1
+if [ $# -gt 1 ]; then
+	shift
+fi
+
+case $SUB_COMMAND in
+	project|Project)
+		. $PRJ_C64_DIR/p64-init-project
+		;;
+	makefile|Makefile)
+		. $PRJ_C64_DIR/p64-init-makefile
+		;;
+	git)
+		. $PRJ_C64_DIR/p64-init-git
+		;;
+	vscode)
+		. $PRJ_C64_DIR/p64-init-vscode
+		;;
+	"")
+		. $PRJ_C64_DIR/p64-init-project
+		. $PRJ_C64_DIR/p64-init-makefile
+		. $PRJ_C64_DIR/p64-init-git
+		. $PRJ_C64_DIR/p64-init-vscode
+		;;
+	*)
+		echo "$SUB_COMMAND is not a valid command !!!"
+		usage
+		exit 1
+		;;
+esac
+
+
+
+echo "Done..."

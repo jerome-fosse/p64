@@ -1,0 +1,5 @@
+ask_project_name() {
+	DEFAULT_PROJECT_NAME=$(basename $(pwd))
+	read -p "Project's name [${DEFAULT_PROJECT_NAME}] : " answer
+	PROJECT_NAME=${answer:-$DEFAULT_PROJECT_NAME}
+}

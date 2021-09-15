@@ -1,0 +1,24 @@
+if ! type "git" >> /dev/null; then
+    echo "git is not installed on your system. Install it then type : p64 init git."
+else
+    read -p "Do you want to use git ? [Y/n] : " answer
+    case $answer in
+        Y|y|Yes|YES|yes|"")
+            GIT="YES"
+            ;;
+        *)
+            GIT="NO"
+            ;;
+    esac
+fi
+
+if [ $GIT = "YES" ]; then
+    git init
+    cat > .gitignore << EOF
+/.vscode
+/build
+.labels
+.breakpoints
+.watches
+EOF
+fi

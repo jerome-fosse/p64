@@ -1,0 +1,60 @@
+create_project_files() {
+    cat > ./src/inc/common.asm << EOF
+    ; colors constants
+    BLACK   = $00
+    WHITE   = $01
+    RED     = $02
+    CYAN    = $03
+    PURPLE  = $04
+    GREEN   = $05
+    BLUE    = $06
+    YELLOW  = $07
+    ORANGE  = $08
+    BROWN   = $09
+    L_RED   = $0a
+    D_GREY  = $0b
+    GREY    = $0c
+    L_GREEN = $0d
+    L_BLUE  = $0e
+    L_GREY  = $0f	
+EOF
+
+    cat > ./src/main.asm << EOF
+	*=\$0801
+	!byte \$0c, \$08, \$0a, \$00, \$9e, \$20
+	!byte \$34, \$30, \$39, \$36, \$00, \$00
+	!byte \$00    
+
+	*=\$1000
+
+	jsr \$e544 ;clear screen
+	ldx #\$00
+
+loop
+	lda mystring,x
+	sta \$0400,x
+	inx
+	cpx #14
+	bne loop
+
+pos_cursor	
+	ldx #01
+	ldy #00
+	clc
+	jsr \$e50a ; set cursor to line 1, column 0
+	rts
+
+mystring
+	!scr "hello world!!!"
+EOF
+}
+
+# Define project's name
+ask_project_name
+
+# source folder
+if [ ! -e "./src" ]; then
+    echo "Creating source folder..."
+    mkdir -p ./src/inc
+    create_project_files
+fi
