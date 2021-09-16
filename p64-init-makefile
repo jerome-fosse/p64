@@ -5,8 +5,8 @@ fi
 echo "Creating source makefile..."
 
 cat > Makefile << EOF
-SRC_DIR := src
-WRK_DIR := build
+SRC_DIR := \${shell pwd}/src
+WRK_DIR := \${shell pwd}/build
 PROJECT_NAME := $PROJECT_NAME
 MAIN_PRJ := $(echo ${PROJECT_NAME} | tr [:upper:] [:lower:]).prg
 MAIN_ASM := \${PROJECT_NAME}.asm
@@ -28,7 +28,7 @@ build: clean
 	@if [ ! -e \${WRK_DIR} ]; then mkdir \${WRK_DIR}; fi
 	@if [ ! -e \${WRK_DIR}/bin/ ]; then mkdir \${WRK_DIR}/bin; fi
 	@if [ ! -e \${WRK_DIR}/report/ ]; then mkdir \${WRK_DIR}/report; fi
-	@\${C64_COMPILER} --msvc --color --format cbm --report \${WRK_DIR}/report/\${PROJECT_NAME}.rpt --outfile \${WRK_DIR}/bin/\${MAIN_PRJ} \${SRC_DIR}/main.asm
+	@cd \${SRC_DIR};\${C64_COMPILER} --msvc --color --format cbm --report \${WRK_DIR}/report/\${PROJECT_NAME}.rpt --outfile \${WRK_DIR}/bin/\${MAIN_PRJ} \${SRC_DIR}/main.asm
 
 run:
 	@echo "Running..."
