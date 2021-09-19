@@ -28,7 +28,7 @@ build: clean
 	@if [ ! -e \${WRK_DIR} ]; then mkdir \${WRK_DIR}; fi
 	@if [ ! -e \${WRK_DIR}/bin/ ]; then mkdir \${WRK_DIR}/bin; fi
 	@if [ ! -e \${WRK_DIR}/report/ ]; then mkdir \${WRK_DIR}/report; fi
-	@cd \${SRC_DIR};\${C64_COMPILER} --msvc --color --format cbm --report \${WRK_DIR}/report/\${PROJECT_NAME}.rpt --outfile \${WRK_DIR}/bin/\${MAIN_PRJ} \${SRC_DIR}/main.asm
+	@cd \${SRC_DIR};\${C64_COMPILER} --msvc --color --format cbm --vicelabels ../.labels --report \${WRK_DIR}/report/\${PROJECT_NAME}.rpt --outfile \${WRK_DIR}/bin/\${MAIN_PRJ} \${SRC_DIR}/main.asm
 
 run:
 	@echo "Running..."
